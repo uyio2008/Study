@@ -1,4 +1,4 @@
-import { Component, ElementRef, AfterViewInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, AfterViewInit, ViewChild, HostListener } from '@angular/core';
 
 @Component({
   selector: 'app-canvas',
@@ -7,20 +7,25 @@ import { Component, ElementRef, AfterViewInit, ViewChild } from '@angular/core';
 })
 export class CanvasComponent implements AfterViewInit {
 
-  @ViewChild('canvas') 
+  @ViewChild('canvas')
   private canvas: ElementRef<HTMLCanvasElement>;
-
+  private canvasEl: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
 
   isPainting = false;
 
   constructor() { }
-  
+
   ngAfterViewInit(): void {
-    const canvasEl: HTMLCanvasElement = this.canvas.nativeElement;
-    canvasEl.width = window.innerWidth;
-    canvasEl.height = 700;
-    const ctx = canvasEl.getContext('2d');
+    // this.canvas.nativeElement.width = window.innerWidth;
+    // this.canvas.nativeElement.height = window.innerHeight;
+
+    this.canvasEl = this.canvas.nativeElement;
+    this.canvasEl.width = this.canvas.nativeElement.clientWidth;
+    this.canvasEl.height = this.canvas.nativeElement.clientHeight;
+    // this.canvasEl.width = window.innerWidth;
+    // this.canvasEl.height = window.innerHeight;
+    const ctx = this.canvasEl.getContext('2d');
 
     if (!ctx) {
       throw new Error("getContext('2d') failed");
@@ -28,17 +33,17 @@ export class CanvasComponent implements AfterViewInit {
     this.ctx = ctx;
   }
 
-  onMouseDown(event: MouseEvent){
+  onMouseDown(event: MouseEvent) {
     const x = event.offsetX;
     const y = event.offsetY;
 
     this.ctx.beginPath();
-    this.ctx.moveTo(x,y);
+    this.ctx.moveTo(x, y);
     this.isPainting = true;
   }
 
-  onMouseMove(event: MouseEvent){
-    if(!this.isPainting){
+  onMouseMove(event: MouseEvent) {
+    if (!this.isPainting) {
       return;
     }
     const x = event.offsetX;
@@ -48,12 +53,12 @@ export class CanvasComponent implements AfterViewInit {
     this.ctx.stroke();
   }
 
-  onMouseUp(){
+  onMouseUp() {
     this.ctx.closePath();
     this.isPainting = false;
   }
 
-  onMouseLeave(){
+  onMouseLeave() {
     this.ctx.closePath();
     this.isPainting = false;
     console.log("mouse leave");
